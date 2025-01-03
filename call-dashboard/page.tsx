@@ -563,13 +563,13 @@ const DatePicker = ({ onChange }: { onChange: (range: DateRange) => void }) => {
     const paddingDays = Array.from({ length: firstDayOfMonth }, (_, i) => null)
 
     return (
-      <div className="space-y-4">
-        <div className="text-xl font-semibold">
+      <div className="space-y-4 !bg-white">
+        <div className="text-xl font-semibold text-slate-900">
           {format(date, "MMMM yyyy")}
         </div>
-        <div className="grid grid-cols-7 gap-2 text-sm">
+        <div className="grid grid-cols-7 gap-2 text-sm !bg-white">
           {["Su", "Mo", "Tu", "We", "Th", "Fr", "Sa"].map((day) => (
-            <div key={day} className="text-center text-slate-500">
+            <div key={day} className="text-center !text-slate-900 font-medium">
               {day}
             </div>
           ))}
@@ -584,27 +584,30 @@ const DatePicker = ({ onChange }: { onChange: (range: DateRange) => void }) => {
             
             return (
               <Button
-  key={index}
-  variant="ghost"
-  className={`h-9 w-9 p-0 font-normal transition-colors
-    ${isSelected 
-      ? 'bg-slate-900 !text-white hover:bg-slate-800 hover:!text-white focus:!text-white active:!text-white' 
-      : 'text-slate-900 hover:text-slate-900'
-    }
-    ${isInRange && !isSelected ? 'bg-slate-100' : ''}
-    ${day === new Date().getDate() && 
-      date.getMonth() === new Date().getMonth() && 
-      date.getFullYear() === new Date().getFullYear()
-      ? "border border-slate-200"
-      : ""
-    }
-    ${selectedRange.to && date.getTime() === selectedRange.to.getTime() 
-      ? '!bg-slate-900 !text-white hover:!bg-slate-800 hover:!text-white focus:!text-white active:!text-white' 
-      : ''
-    }`}
-  onClick={() => handleDateClick(currentDate)}
->
-                {day}
+                key={index}
+                variant="ghost"
+                className={`h-9 w-9 p-0 font-normal transition-colors !bg-white !text-slate-900
+                  ${isSelected 
+                    ? 'bg-slate-900 !text-white hover:bg-slate-800 hover:!text-white focus:!text-white active:!text-white' 
+                    : '!text-slate-900 hover:text-slate-900'
+                  }
+                  ${isInRange && !isSelected ? 'bg-slate-100 !text-slate-900' : ''}
+                  ${day === new Date().getDate() && 
+                    date.getMonth() === new Date().getMonth() && 
+                    date.getFullYear() === new Date().getFullYear()
+                    ? "border border-slate-200"
+                    : ""
+                  }
+                  ${selectedRange.to && date.getTime() === selectedRange.to.getTime()
+                    ? '!bg-slate-900 !text-white hover:!bg-slate-800 hover:!text-white focus:!text-white active:!text-white' 
+                    : ''
+                  }`}
+                style={{ color: isSelected ? 'white' : '#0f172a' }}
+                onClick={() => handleDateClick(currentDate)}
+              >
+                <span className={isSelected ? '!text-white' : '!text-slate-900'}>
+                  {day}
+                </span>
               </Button>
             )
           })}
@@ -659,7 +662,7 @@ const DatePicker = ({ onChange }: { onChange: (range: DateRange) => void }) => {
   ]
 
   return (
-    <Card className="p-4 space-y-4">
+    <Card className="p-4 space-y-4 !bg-white shadow-lg rounded-2xl">
       <Button 
         variant="outline" 
         className="w-full justify-center text-center h-10 px-4 py-2"
@@ -677,7 +680,7 @@ const DatePicker = ({ onChange }: { onChange: (range: DateRange) => void }) => {
           <ChevronLeft className="h-4 w-4" />
           <span className="sr-only">Previous month</span>
         </Button>
-        <div className="grid grid-cols-2 gap-8">
+        <div className="grid grid-cols-2 gap-8 !bg-white">
           {renderMonth(firstMonth)}
           {renderMonth(secondMonth)}
         </div>
@@ -719,7 +722,7 @@ function DashboardContent() {
     isOpen: boolean; 
     call: CallLog | null 
   }>({ isOpen: false, call: null })
-  const [callNotes, setCallNotes] = useState<Record<number, string>>({})
+  const [callNotes, setCallNotes] = useState<Record<number, { text: string; type: 'notes' | 'feedback' }>>({})
   const [callLogs, setCallLogs] = useState<CallLog[]>([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -879,13 +882,12 @@ const averageSuccessData = React.useMemo(() => callLogs.map((call, index) => ({
     }))
   }, [])
 
-  // With these:
-const handleNotesChange = (id: number, notes: string) => {
-  setCallNotes(prev => ({
-    ...prev,
-    [id]: notes
-  }))
-}
+  const handleNotesChange = (id: number, notes: { text: string; type: 'notes' | 'feedback' }) => {
+    setCallNotes(prev => ({
+      ...prev,
+      [id]: notes
+    }))
+  }
 
 const saveNotes = async (id: number) => {
   try {
@@ -895,7 +897,7 @@ const saveNotes = async (id: number) => {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        call_notes: callNotes[id]
+        call_notes: callNotes[id]?.text
       })
     });
 
@@ -1035,23 +1037,23 @@ const saveNotes = async (id: number) => {
 
         {/* Empty State for Charts */}
         <div className="mb-8">
-          <Card className="relative overflow-hidden border-0 bg-white rounded-[32px] shadow-lg h-[400px] flex items-center justify-center">
-            <div className="text-center p-6">
-              <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
-              <h3 className="text-xl font-semibold text-slate-900 mb-2">No Calls Recorded Yet</h3>
-              <p className="text-slate-600 max-w-sm mx-auto">
-                Your performance metrics and analytics will appear here after your first call is recorded.
-              </p>
-            </div>
-          </Card>
+        <Card className="relative overflow-hidden border-0 !bg-white rounded-[32px] shadow-lg h-[400px] flex items-center justify-center">
+          <div className="text-center p-6 bg-white">
+            <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
+            <h3 className="text-xl font-semibold text-slate-900 mb-2">No Calls Recorded Yet</h3>
+            <p className="text-slate-600 max-w-sm mx-auto">
+              Your performance metrics and analytics will appear here after your first call is recorded.
+            </p>
+          </div>
+        </Card>
         </div>
 
         {/* Empty State for Categories */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
           {scoreCategories.map((category) => (
-            <Card key={category.key} className="relative overflow-hidden border-0 bg-white rounded-[32px] shadow-lg h-[400px] flex items-center justify-center">
-              <div className="text-center p-6">
-                <div className="flex items-center justify-center gap-2 mb-4">
+            <Card key={category.key} className="relative overflow-hidden border-0 !bg-white rounded-[32px] shadow-lg h-[400px] flex items-center justify-center">
+              <div className="text-center p-6 !bg-white">
+                <div className="flex items-center justify-center gap-2 mb-4 !bg-white">
                   <MessageSquare className="h-5 w-5 text-slate-400" />
                   <span className="text-slate-900 text-xl font-semibold">
                     {category.label}
@@ -1061,7 +1063,7 @@ const saveNotes = async (id: number) => {
                   {category.description}
                 </p>
               </div>
-            </Card>
+          </Card>
           ))}
         </div>
 
@@ -1078,8 +1080,8 @@ const saveNotes = async (id: number) => {
   <div></div>
 </div>
 <Card className="bg-white shadow-lg rounded-[32px] overflow-hidden border-0">
-  <CardContent className="p-12 text-center">
-            <div className="max-w-sm mx-auto">
+  <CardContent className="p-12 text-center !bg-white">
+              <div className="max-w-sm mx-auto !bg-white">
               <MessageSquare className="h-12 w-12 text-slate-400 mx-auto mb-4" />
               <h3 className="text-xl font-semibold text-slate-900 mb-2">No Call History</h3>
               <p className="text-slate-600 mb-6">
@@ -1287,22 +1289,43 @@ const saveNotes = async (id: number) => {
 
         <Card className="relative overflow-hidden border-0 bg-white rounded-[32px] shadow-lg">
           <CardContent className="p-6 bg-white">
-            <h3 className="text-lg font-semibold text-slate-900 mb-2">Call Notes</h3>
+            <div className="flex justify-between items-center mb-2">
+              <h3 className="text-lg font-semibold text-slate-900">
+                {callNotes[call.id]?.type === 'feedback' ? 'Manager\'s Feedback' : 'Call Notes'}
+              </h3>
+              <Button
+                variant="outline"
+                size="sm"
+                className="rounded-full text-slate-600"
+                onClick={() => handleNotesChange(call.id, {
+                  text: callNotes[call.id]?.text ?? call.call_notes,
+                  type: callNotes[call.id]?.type === 'feedback' ? 'notes' : 'feedback'
+                })} 
+              >
+                Switch to {callNotes[call.id]?.type === 'feedback' ? 'Call Notes' : 'Manager\'s Feedback'}
+              </Button>
+            </div>
             <Textarea
-              placeholder="Enter your notes here..."
-              value={callNotes[call.id] ?? call.call_notes}
-              onChange={(e) => handleNotesChange(call.id, e.target.value)}
-              className="min-h-[100px] mb-2 rounded-[20px]"
+              placeholder={callNotes[call.id]?.type === 'feedback' ? "No feedback provided yet" : "Enter your notes here..."}
+              value={callNotes[call.id]?.text ?? call.call_notes}
+              onChange={(e) => handleNotesChange(call.id, {
+                text: e.target.value,
+                type: callNotes[call.id]?.type || 'notes'
+              })}
+              className={`min-h-[100px] mb-2 rounded-[20px] ${callNotes[call.id]?.type === 'feedback' ? 'bg-gray-50' : ''}`}
+              readOnly={callNotes[call.id]?.type === 'feedback'}
             />
-            <Button 
-              onClick={() => saveNotes(call.id)}
-              className="w-full rounded-[20px]"
-            >
-              {savedStates[call.id] ? "Saved!" : "Save Notes"}
-            </Button>
-          </CardContent>
-        </Card>
-      </div>
+            {callNotes[call.id]?.type !== 'feedback' && (
+              <Button 
+                onClick={() => saveNotes(call.id)}
+                className="w-full rounded-[20px]"
+              >
+                {savedStates[call.id] ? "Saved!" : "Save"}
+              </Button>
+            )}
+                      </CardContent>
+                    </Card>
+                  </div>
 
       {/* Analysis and Level Up Section */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
